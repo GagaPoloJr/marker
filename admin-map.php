@@ -46,25 +46,6 @@ include_once 'locations_model.php';
         let totalLocation = locations.length
         for (i = 0; i < locations.length; i++) {
             let id_loc = locations[i][0];
-            // $.ajax({
-            //     type: "POST",
-            //     url: 'test.php?id=' + id_loc,
-            //     dataType: 'json',
-            //     async: false,
-            //     success: function(data) {
-            //         agenda = data
-            //         for (let x = 0; x < agenda.length; x++) {
-            //             if (agenda[x].id_location == locations[x][0]) {
-            //                 dataAgenda += `
-            //                     <div id="data_table" class="data_table">
-            //                     ${agenda[x].judul}
-            //                     </div>
-            //                     `
-            //             }
-            //         }
-
-            //     }
-            // });
 
             $.ajax({
                 type: "POST",
@@ -85,8 +66,6 @@ include_once 'locations_model.php';
 
                 }
             });
-            console.log(dataAgenda)
-
 
 
             confirmed = locations[i][4] === '1' ? 'checked' : 0;
