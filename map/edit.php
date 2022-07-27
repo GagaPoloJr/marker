@@ -33,32 +33,40 @@ $row = mysqli_fetch_assoc($data);
                 Edit Lokasi
             </div>
             <div class="card-body">
-                <form action="" method="post" role="form">
-                <input type="hidden" name="id" required="" value="<?= $row['id']; ?>">
+                <form action="" method="post" role="form" enctype="multipart/form-data">
+                    <input type="hidden" name="id" required="" value="<?= $row['id']; ?>">
                     <div class="form-group">
                         <label>judul</label>
-                        <input type="text" name="title" required="" class="form-control"  value="<?= $row['title']; ?>">
+                        <input type="text" name="title" required="" class="form-control" value="<?= $row['title']; ?>">
                     </div>
                     <div class="form-group">
                         <label>Latitude</label>
-                        <input type="number" step="any" name="lat" required="" class="form-control"  value="<?= $row['lat']; ?>">
+                        <input type="number" step="any" name="lat" required="" class="form-control" value="<?= $row['lat']; ?>">
                     </div>
                     <div class="form-group">
                         <label>Longitude</label>
-                        <input type="number" step="any" name="lng" required="" class="form-control"  value="<?= $row['lng']; ?>">
+                        <input type="number" step="any" name="lng" required="" class="form-control" value="<?= $row['lng']; ?>">
                     </div>
 
                     <div class="form-group">
                         <label>Deskripsi</label>
-                        <textarea class="form-control" name="description"><?= $row['description']; ?>
-                        </textarea>
+                        <textarea class="form-control" name="description"><?= $row['description']; ?></textarea>
                     </div>
 
                     <div class="form-group">
                         <label>Kecamatan</label>
-                        <textarea class="form-control" name="kecamatan"><?= $row['kecamatan']; ?>
-                        </textarea>
+                        <textarea class="form-control" required name="kecamatan"><?= $row['kecamatan']; ?></textarea>
                     </div>
+
+                    <div class="form-group">
+                        <label>Image</label>
+                        <div>
+                            <?= $row['image'] ?>
+                        </div>
+                        <input type="file" name="image" class="form-control">
+                    </div>
+
+
 
                     <button type="submit" class="btn btn-warning" name="submit" value="update">Update data</button>
                 </form>
@@ -74,14 +82,43 @@ $row = mysqli_fetch_assoc($data);
                     $lng = $_POST['lng'];
                     $description = $_POST['description'];
                     $kecamatan = $_POST['kecamatan'];
+                    $filename = $_FILES['image']['name'];
 
-                    //query untuk menambahkan barang ke database, pastikan urutan nya sama dengan di database
-                    // $datas = mysqli_query($koneksi, "insert into locations (title,lat,lng,description,kecamatan)values('$title', '$lat', '$lng', '$description', '$kecamatan')") or die(mysqli_error($koneksi));
-                   //query mengubah barang
-					mysqli_query($koneksi, "update locations set title='$title', lat='$lat', lng='$lng', description='$description', kecamatan='$kecamatan' where id ='$id'") or die(mysqli_error($koneksi));
+                    // jika tidak ingin update gambar, pakai gambar lama
+                    if (!$filename) {
+                        $new_gambar = $row['image'];
+                        $datas = mysqli_query($koneksi, "update locations set title='$title', lat='$lat', lng='$lng', description='$description', kecamatan='$kecamatan', image='$new_gambar' where id ='$id'") or die(mysqli_error($koneksi));
+                        echo "<script>alert('data berhasil disimpan.'); window.location = 'index.php'</script>";
+                    } else {
+                        $rand = rand();
+                        $ekstensi =  array('png', 'jpg', 'jpeg', 'gif');
+                        $ukuran = $_FILES['image']['size'];
+                        $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
-                    //ini untuk menampilkan alert berhasil dan redirect ke halaman index
-                    echo "<script>alert('data berhasil diupdate.');window.location='index.php';</script>";
+                        if (!in_array($ext, $ekstensi)) {
+                            // header("location:index.php?alert=gagal_ekstensi");
+                            echo "<script>alert('Ekstensi gambar tidak didukung kecuali png,jpg,jpeg,gif') </script>";
+
+                        } else {
+                            if ($ukuran < 104407000) {
+                                // hapus gambar sebelumnya
+                                unlink('../gambar/location/' . $row['image']);
+
+                                $new_gambar = $rand . '_' . $filename;
+                                move_uploaded_file($_FILES['image']['tmp_name'], '../gambar/location/' . $rand . '_' . $filename);
+                             
+
+                                $datas = mysqli_query($koneksi, "update locations set title='$title', lat='$lat', lng='$lng', description='$description', kecamatan='$kecamatan', image='$new_gambar' where id ='$id'") or die(mysqli_error($koneksi));
+                                //ini untuk menampilkan alert berhasil dan redirect ke halaman index
+                                echo "<script>alert('data berhasil diupdate.');window.location='index.php';</script>";
+
+                                // header("location:index.php?alert=berhasil");
+                            } else {
+                                echo "<script>alert('ukuran gambar terlalu besar silahkan input ulang') </script>";
+                            }
+                        }
+                    }
+
                 }
                 ?>
             </div>

@@ -47,7 +47,7 @@
 
 					<div class="form-group">
 						<label>Dokumentasi</label>
-						<input required type="file" name="dokumentasi" class="form-control">
+						<input type="file" name="dokumentasi" class="form-control">
 						<p style="color: red">Ekstensi yang diperbolehkan .png | .jpg | .jpeg | .gif</p>
 					</div>
 

@@ -22,33 +22,31 @@
 			<div class="card-body">
 				<form action="" method="post" role="form" enctype="multipart/form-data">
 					<div class="form-group">
-						<label>Kegiatan</label>
-						<input type="text" name="judul" required="" class="form-control">
+						<label>judul</label>
+						<input type="text" name="title" required="" class="form-control">
 					</div>
 					<div class="form-group">
-						<label>Tindak Lanjut</label>
-						<input type="text" name="status" required="" class="form-control">
+						<label>Latitude</label>
+						<input type="number" step="any" name="lat" required="" class="form-control">
 					</div>
 					<div class="form-group">
-						<label>hasil</label>
-						<textarea class="form-control" name="hasil"></textarea>
-					</div>
-
-
-					<div class="form-group">
-						<label>Persetujuan</label>
-						<input type="text" name="persetujuan" required="" class="form-control">
+						<label>Longitude</label>
+						<input type="number" step="any" name="lng" required="" class="form-control">
 					</div>
 
 					<div class="form-group">
-						<label>Tanggal</label>
-						<input type="date" name="tanggal" required="" class="form-control">
+						<label>Deskripsi</label>
+						<textarea class="form-control" name="description"></textarea>
 					</div>
 
 					<div class="form-group">
-						<label>Dokumentasi</label>
-						<input required type="file" name="dokumentasi" class="form-control">
-						<p style="color: red">Ekstensi yang diperbolehkan .png | .jpg | .jpeg | .gif</p>
+						<label>Kecamatan</label>
+						<textarea class="form-control" name="kecamatan"></textarea>
+					</div>
+
+					<div class="form-group">
+						<label>Image</label>
+						<input type="file"  name="image"  class="form-control">
 					</div>
 
 
@@ -56,22 +54,21 @@
 				</form>
 
 				<?php
-				include('../../koneksi.php');
+				include('../koneksi.php');
 
 				//melakukan pengecekan jika button submit diklik maka akan menjalankan perintah simpan dibawah ini
 				if (isset($_POST['submit'])) {
 					//menampung data dari inputan
-					$id_location = $_GET['id_location'];
-					$judul = $_POST['judul'];
-					$status = $_POST['status'];
-					$hasil = $_POST['hasil'];
-					$persetujuan = $_POST['persetujuan'];
-					$tanggal = $_POST['tanggal'];
+					$title = $_POST['title'];
+					$lat = $_POST['lat'];
+					$lng = $_POST['lng'];
+					$description = $_POST['description'];
+					$kecamatan = $_POST['kecamatan'];
 
 					$rand = rand();
 					$ekstensi =  array('png', 'jpg', 'jpeg', 'gif');
-					$filename = $_FILES['dokumentasi']['name'];
-					$ukuran = $_FILES['dokumentasi']['size'];
+					$filename = $_FILES['image']['name'];
+					$ukuran = $_FILES['image']['size'];
 					$ext = pathinfo($filename, PATHINFO_EXTENSION);
 
 					if (!in_array($ext, $ekstensi)) {
@@ -79,12 +76,13 @@
 					} else {
 						if ($ukuran < 104407000) {
 							$new_gambar = $rand . '_' . $filename;
-							move_uploaded_file($_FILES['dokumentasi']['tmp_name'], '../../gambar/' . $rand . '_' . $filename);
-							// mysqli_query($koneksi, "INSERT INTO user VALUES(NULL,'$nama','$kontak','$alamat','$new_gambar')");
+							move_uploaded_file($_FILES['image']['tmp_name'], '../gambar/location/' . $rand . '_' . $filename);
+						
+							//query untuk menambahkan barang ke database, pastikan urutan nya sama dengan di database
+							$datas = mysqli_query($koneksi, "insert into locations (title,lat,lng,description,kecamatan, image)values('$title', '$lat', '$lng', '$description', '$kecamatan', '$new_gambar')") or die(mysqli_error($koneksi));
 
-							$datas = mysqli_query($koneksi, "insert into agenda (id_location, judul,status, hasil,persetujuan,tanggal,dokumentasi)values('$id_location', '$judul', '$status', '$hasil', '$persetujuan', '$tanggal', '$new_gambar')") or die(mysqli_error($koneksi));
-							echo "<script>alert('data berhasil disimpan.'); window.location = 'index.php?id_location=$id_location'</script>";
-
+							//ini untuk menampilkan alert berhasil dan redirect ke halaman index
+							echo "<script>alert('data berhasil disimpan.');window.location='index.php';</script>";
 							// header("location:index.php?alert=berhasil");
 						} else {
 							echo "<script>alert('ukuran gambar terlalu besar silahkan input ulang') </script>";

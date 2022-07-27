@@ -36,17 +36,17 @@
 
 					<div class="form-group">
 						<label>Deskripsi</label>
-						<textarea class="form-control" name="description"></textarea>
+						<textarea class="form-control" required name="description"></textarea>
 					</div>
 
 					<div class="form-group">
 						<label>Kecamatan</label>
-						<textarea class="form-control" name="kecamatan"></textarea>
+						<textarea class="form-control" required name="kecamatan"></textarea>
 					</div>
 
 					<div class="form-group">
 						<label>Image</label>
-						<input type="file"  name="image"  class="form-control">
+						<input required type="file"  name="image"  class="form-control">
 					</div>
 
 
