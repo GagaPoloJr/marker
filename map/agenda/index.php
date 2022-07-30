@@ -63,9 +63,11 @@
                         $no = 1; //untuk pengurutan nomor
 
                         //melakukan perulangan
-                        while ($row = mysqli_fetch_assoc($datas)) {
-                        ?>
 
+                                    
+                        while ($row = mysqli_fetch_assoc($datas)) {
+
+                        ?>
                             <tr>
                                 <td><?= $no; ?></td>
                                 <td><?= $row['judul']; //untuk menampilkan nama 
@@ -74,7 +76,27 @@
                                 <td><?= $row['hasil']; ?></td>
                                 <td><?= $row['persetujuan']; ?></td>
                                 <td><?= $row['tanggal']; ?></td>
-                                <td> <img width="200" src="../../gambar/<?= $row['dokumentasi']; ?>" alt=""></td>
+                                
+                                <td>
+                                   <?php
+                                   $doc = (json_decode($row['dokumentasi'],true));
+                                    if(count($doc) > 1){
+                                        for($i=0; $i <1; $i++){
+                                            $testing_image = $doc[$i]['dokumentasi'];
+                                            echo '<img width="200" src="../../gambar/'.$testing_image.'" alt=""> ';
+                                            echo '<button>lihat semua gambar</button>';
+                                         }
+                                    }
+                                    else {
+                                        for($i=0; $i <1; $i++){
+                                            $testing_image = $doc[$i]['dokumentasi'];
+                                            echo '<img width="200" src="../../gambar/'.$testing_image.'" alt=""> ';
+                                         }
+                                    }
+                                
+                                    
+                                   ?>
+                                </td>
                                 <td>
                                     <a href="edit.php?id_location=<?= $row['id_location']; ?>&id_agenda=<?= $row['id_agenda']; ?>" class="btn btn-sm btn-warning">Edit</a>
                                     <a href="delete.php?id_location=<?= $row['id_location']; ?>&id_agenda=<?= $row['id_agenda']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('anda yakin ingin hapus?');">Hapus</a>

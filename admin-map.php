@@ -1,6 +1,20 @@
 <?php
 include_once 'header.php';
 include_once 'locations_model.php';
+
+
+session_start();
+
+// function prompt($prompt_msg){
+//     echo("<script type='text/javascript'> var new_pass = prompt('".$prompt_msg."'); </script>");
+//     return($prompt_msg);
+// }
+if(!$_SESSION['password']){
+    header("location:access.php");
+}
+
+// session_destroy()
+
 ?>
 <style>
     #image_data img {
@@ -20,18 +34,21 @@ include_once 'locations_model.php';
     var red_icon = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
     var purple_icon = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
     var locations = <?php get_all_locations() ?>;
-
+    var getDataCenterMap = <?php get_center_map() ?>;
+    var dataCenter = getDataCenterMap[0];
 
     function initMap() {
         // -6.175168397319318, 106.8272493571782
         var centerMap = {
-            lat: -6.175168397319318,
-            lng: 106.8272493571782
+            // lat: -6.175168397319318,
+            // lng: 106.8272493571782,
+            lat: parseFloat(dataCenter.lat),
+            lng: parseFloat(dataCenter.lng),
         };
         infowindow = new google.maps.InfoWindow();
         map = new google.maps.Map(document.getElementById('map'), {
             center: centerMap,
-            zoom: 15
+            zoom: parseFloat(dataCenter.zoom)
         });
 
 

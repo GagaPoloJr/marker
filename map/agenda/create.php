@@ -47,7 +47,7 @@
 
 					<div class="form-group">
 						<label>Dokumentasi</label>
-						<input required type="file" name="dokumentasi" class="form-control">
+						<input required type="file" name="dokumentasi[]" class="form-control" multiple>
 						<p style="color: red">Ekstensi yang diperbolehkan .png | .jpg | .jpeg | .gif</p>
 					</div>
 
@@ -70,26 +70,35 @@
 
 					$rand = rand();
 					$ekstensi =  array('png', 'jpg', 'jpeg', 'gif');
-					$filename = $_FILES['dokumentasi']['name'];
-					$ukuran = $_FILES['dokumentasi']['size'];
-					$ext = pathinfo($filename, PATHINFO_EXTENSION);
 
-					if (!in_array($ext, $ekstensi)) {
-						header("location:index.php?alert=gagal_ekstensi");
-					} else {
-						if ($ukuran < 104407000) {
-							$new_gambar = $rand . '_' . $filename;
-							move_uploaded_file($_FILES['dokumentasi']['tmp_name'], '../../gambar/' . $rand . '_' . $filename);
-							// mysqli_query($koneksi, "INSERT INTO user VALUES(NULL,'$nama','$kontak','$alamat','$new_gambar')");
-
-							$datas = mysqli_query($koneksi, "insert into agenda (id_location, judul,status, hasil,persetujuan,tanggal,dokumentasi)values('$id_location', '$judul', '$status', '$hasil', '$persetujuan', '$tanggal', '$new_gambar')") or die(mysqli_error($koneksi));
-							echo "<script>alert('data berhasil disimpan.'); window.location = 'index.php?id_location=$id_location'</script>";
-
-							// header("location:index.php?alert=berhasil");
-						} else {
-							echo "<script>alert('ukuran gambar terlalu besar silahkan input ulang') </script>";
+					$jumlahFile = count($_FILES['dokumentasi']['name']);
+					$limit = 10 * 1024 * 1024; //10 foto 1 mb
+					
+					for ($x = 0; $x < $jumlahFile; $x++) {
+						$filename = $_FILES['dokumentasi']['name'][$x];
+						$tmp = $_FILES['dokumentasi']['tmp_name'][$x];
+						$ext = pathinfo($filename, PATHINFO_EXTENSION);
+						$ukuran = $_FILES['dokumentasi']['size'][$x];	
+						if($ukuran > $limit){
+							header("location:index.php?id_location=$id_location&alert=gagal_ukuran");		
+						}
+						else {
+							if(!in_array($ext, $ekstensi)){
+								header("location:index.php?id_location=$id_location&alert=gagal_ektensi");			
+							}
+							else {
+								$new_gambar = $rand.'_'.$filename;
+								move_uploaded_file($tmp, '../../gambar/'.$new_gambar);
+								$new_array[] = array(
+									"dokumentasi" =>  $new_gambar
+								);
+							}
 						}
 					}
+					$new_doc = json_encode($new_array);
+					$datas = mysqli_query($koneksi, "insert into agenda (id_location, judul,status, hasil,persetujuan,tanggal,dokumentasi)values('$id_location', '$judul', '$status', '$hasil', '$persetujuan', '$tanggal', '$new_doc')") or die(mysqli_error($koneksi));
+					echo "<script>alert('data berhasil disimpan.'); window.location = 'index.php?id_location=$id_location'</script>";
+					
 				}
 				?>
 			</div>

@@ -7,6 +7,7 @@ $id_agenda = $_GET['id_agenda']; //mengambil id
 $data = mysqli_query($koneksi, "select * from agenda where id_agenda = '$id_agenda'");
 $row = mysqli_fetch_assoc($data);
 
+
 ?>
 
 <!doctype html>
@@ -61,7 +62,42 @@ $row = mysqli_fetch_assoc($data);
                     <div class="form-group">
                         <label>Dokumentasi</label>
                         <div>
-                            <?= $row['dokumentasi'] ?>
+                        <?php
+                                   $doc = (json_decode($row['dokumentasi'],true));
+                                    if(count($doc) > 1){
+                                        $result =array();
+
+                                        foreach($doc as $index => $value){
+                                            print_r($value) ;
+                                            // echo $value[0]->dokumentasi;
+                                        }
+                                        // for($i=0; $i <count($doc); $i++){
+                                            
+                                            
+                                        //     $testing_image = $doc[$i]['dokumentasi'];
+                                        //     echo '<img width="200" src="../../gambar/'.$testing_image.'" alt=""> ';
+                                        //     echo '<input type="submit" name="delete'.$i.'" value="delete"/> ';
+                                        //     // print_r($_POST['delete']);
+                                        //     // print_r($doc[$i]);
+                                        //     if(isset($_POST['delete'.$i])){
+                                        //         unset($doc[$i]);
+                                        //         // echo '<script>alert("berhasil delete'.$testing_image.'")</script>';
+                                        //         // $datas = mysqli_query($koneksi, "update agenda set  dokumentasi ='$doc' where id_agenda ='$id_agenda'") or die(mysqli_error($koneksi));
+                                        //         // echo "berhasil";
+                                                
+                                        //     }
+                                        //     array_push($result,$doc[$i]);
+                                        //  }
+
+                                        
+                                    }
+                                    else {
+                                        for($i=0; $i <1; $i++){
+                                            $testing_image = $doc[$i]['dokumentasi'];
+                                            echo '<img width="200" src="../../gambar/'.$testing_image.'" alt=""> ';
+                                         }
+                                    }
+                            ?>
                         </div>
                         <input type="file" name="dokumentasi" class="form-control">
                     </div>
@@ -94,8 +130,52 @@ $row = mysqli_fetch_assoc($data);
                     } else {
                         $rand = rand();
                         $ekstensi =  array('png', 'jpg', 'jpeg', 'gif');
-                        $ukuran = $_FILES['dokumentasi']['size'];
-                        $ext = pathinfo($filename, PATHINFO_EXTENSION);
+                        // $ukuran = $_FILES['dokumentasi']['size'];
+                        // $ext = pathinfo($filename, PATHINFO_EXTENSION);
+                        
+                        $limit = 10 * 1024 * 1024; //10 foto 1 mb
+                        $jumlahFile = count($_FILES['dokumentasi']['name']);
+                        $current_doc = json_decode($row['dokumentasi'], true);
+
+                        for ($x = 0; $x < $jumlahFile; $x++) {
+                            $nama_file = $_FILES['dokumentasi']['name'][$x];
+                            $tmp = $_FILES['dokumentasi']['tmp_name'][$x];
+                            $ext = pathinfo($nama_file, PATHINFO_EXTENSION);
+                            $ukuran = $_FILES['dokumentasi']['size'][$x];	
+                            if($ukuran > $limit){
+                                header("location:index.php?id_location=$id_location&alert=gagal_ukuran");		
+                            }
+                            else {
+                                if(!in_array($ext, $ekstensi)){
+                                    header("location:index.php?id_location=$id_location&alert=gagal_ektensi");			
+                                }
+                                else {
+                                    $new_gambar = $rand.'_'.$filename;
+                                    move_uploaded_file($tmp, '../../gambar/'.$new_gambar);
+                                    $new_array[] = array(
+                                        "dokumentasi" =>  $new_gambar
+                                    );
+                                }
+                            }
+
+						
+
+
+                        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                         if (!in_array($ext, $ekstensi)) {
                             header("location:index.php?alert=gagal_ekstensi");

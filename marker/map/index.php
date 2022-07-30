@@ -27,6 +27,7 @@
 						<tr>
 							<th>No</th>
 							<th>Judul</th>
+							<th>Gambar</th>
 							<th>Deskripsi</th>
 							<th>Kecamatan</th>
 							<th>Aksi</th>
@@ -48,6 +49,9 @@
 								<td><?= $no; ?></td>
 								<td><?= $row['title']; //untuk menampilkan nama 
 									?></td>
+								<td>
+									<img width="200" src="../gambar/location/<?= $row['image']?>"/>
+								</td>
 								<td><?= $row['description']; ?></td>
 								<td><?= $row['kecamatan']; ?></td>
 								<td>

@@ -2,10 +2,14 @@
 include_once 'header.php';
 include 'locations_model.php';
 //get_unconfirmed_locations();exit;
+
 ?>
 
+
+
+
 <style>
-     #image_data img {
+    #image_data img {
         width: 100%;
         height: 300px;
         object-fit: cover;
@@ -25,13 +29,16 @@ include 'locations_model.php';
     var red_icon = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
     var purple_icon = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
     var locations = <?php get_confirmed_locations() ?>;
+    var getDataCenterMap = <?php get_center_map() ?>;
+    var dataCenter = getDataCenterMap[0];
+
     var centerMap = {
-            lat: -6.175168397319318,
-            lng: 106.8272493571782
-        };
+        lat: parseFloat(dataCenter.lat),
+        lng: parseFloat(dataCenter.lng),
+    };
     var myOptions = {
-        zoom: 15,
-        center: new google.maps.LatLng(centerMap.lat,centerMap.lng),
+        zoom: parseFloat(dataCenter.zoom),
+        center: new google.maps.LatLng(centerMap.lat, centerMap.lng),
         mapTypeId: 'roadmap'
     };
     map = new google.maps.Map(document.getElementById('map'), myOptions);
@@ -68,30 +75,28 @@ include 'locations_model.php';
     /**
      * Binds click event to given map and invokes a callback that appends a new marker to clicked location.
      */
-    // var addMarker = google.maps.event.addListener(map, 'click', function(e) {
-    //     var lat = e.latLng.lat(); // lat of clicked point
-    //     var lng = e.latLng.lng(); // lng of clicked point
-    //     var markerId = getMarkerUniqueId(lat, lng); // an that will be used to cache this marker in markers object.
-    //     var marker = new google.maps.Marker({
-    //         position: getLatLng(lat, lng),
-    //         map: map,
-    //         animation: google.maps.Animation.DROP,
-    //         id: 'marker_' + markerId,
-    //         html: "    <div id='info_"+markerId+"'>\n" +
-    //         "        <table class=\"map1\">\n" +
-    //         "            <tr>\n" +
-    //         "                <td><a>Description:</a></td>\n" +
-    //         "                <td><textarea  id='manual_description' placeholder='Description'></textarea></td></tr>\n" +
-    //         "                <td><a>Kecamatan:</a></td>\n" +
-    //         "                <td><textarea  id='manual_kecamatan' placeholder='Kecamatan'></textarea></td></tr>\n" +
-    //         "            <tr><td></td><td><input type='button' value='Save' onclick='saveData("+lat+","+lng+")'/></td></tr>\n" +
-    //         "        </table>\n" +
-    //         "    </div>"
-    //     });
-    //     markers[markerId] = marker; // cache marker in markers object
-    //     bindMarkerEvents(marker); // bind right click event to marker
-    //     bindMarkerinfo(marker); // bind infowindow with click event to marker
-    // });
+    var addMarker = google.maps.event.addListener(map, 'click', function(e) {
+        var lat = e.latLng.lat(); // lat of clicked point
+        var lng = e.latLng.lng(); // lng of clicked point
+        var markerId = getMarkerUniqueId(lat, lng); // an that will be used to cache this marker in markers object.
+        var marker = new google.maps.Marker({
+            position: getLatLng(lat, lng),
+            map: map,
+            animation: google.maps.Animation.DROP,
+            id: 'marker_' + markerId,
+            html: "    <div id='info_" + markerId + "'>\n" +
+                "        <table class=\"map1\">\n" +
+                "            <tr>\n" +
+                "                <td><a>Anda yakin menambah titik ini?</a></td>\n" +
+                "                      <tr><td>&nbsp;</td></tr>\n" +
+                "            <tr><td><input class='btn btn-info' type='button' value='Save' onclick='saveData(" + lat + "," + lng + ")'/></td></tr>\n" +
+                "        </table>\n" +
+                "    </div>"
+        });
+        markers[markerId] = marker; // cache marker in markers object
+        bindMarkerEvents(marker); // bind right click event to marker
+        bindMarkerinfo(marker); // bind infowindow with click event to marker
+    });
 
     /**
      * Binds  click event to given marker and invokes a callback function that will remove the marker from map.
@@ -130,7 +135,6 @@ include 'locations_model.php';
         delete markers[markerId]; // delete marker instance from markers object
     };
 
-    let dataAgenda = "";
 
 
     /**
@@ -139,7 +143,7 @@ include 'locations_model.php';
     var i;
     var confirmed = 0;
     let totalLocation = locations.length
-    console.log(locations)
+
     for (i = 0; i < locations.length; i++) {
         let id_loc = locations[i][0];
         $.ajax({
@@ -148,6 +152,8 @@ include 'locations_model.php';
             dataType: 'json',
             async: false,
             success: function(data) {
+                let dataAgenda = "";
+
                 agenda = data
                 if (agenda.length > 0) {
                     for (let x = 0; x < agenda.length; x++) {
@@ -167,16 +173,11 @@ include 'locations_model.php';
                     }
                 }
 
-            }
-        });
-
-
-
-        marker = new google.maps.Marker({
-            position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-            map: map,
-            icon: locations[i][4] === '1' ? red_icon : purple_icon,
-            html: `
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                    map: map,
+                    icon: locations[i][4] === '1' ? red_icon : purple_icon,
+                    html: `
                 <div style="" class="form" id="form">
                     <div id="image_data" class="mt-3">
                     <img src="gambar/location/${locations[i][6]}" alt="">
@@ -214,21 +215,28 @@ include 'locations_model.php';
                 </div>
                 
                 `
+                });
+
+                google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                    return function() {
+                        infowindow = new google.maps.InfoWindow();
+                        confirmed = locations[i][4] === '1' ? 'checked' : 0;
+                        $("#confirmed").prop(confirmed, locations[i][4]);
+                        $("#id").val(locations[i][0]);
+                        $("#description").val(locations[i][3]);
+                        $("#kecamatan").val(locations[i][5]);
+                        $("#form").show();
+                        infowindow.setContent(marker.html);
+                        infowindow.open(map, marker);
+                    }
+                })(marker, i));
+
+            }
         });
 
-        google.maps.event.addListener(marker, 'click', (function(marker, i) {
-            return function() {
-                infowindow = new google.maps.InfoWindow();
-                confirmed = locations[i][4] === '1' ? 'checked' : 0;
-                $("#confirmed").prop(confirmed, locations[i][4]);
-                $("#id").val(locations[i][0]);
-                $("#description").val(locations[i][3]);
-                $("#kecamatan").val(locations[i][5]);
-                $("#form").show();
-                infowindow.setContent(marker.html);
-                infowindow.open(map, marker);
-            }
-        })(marker, i));
+
+
+
     }
 
     /**
@@ -237,22 +245,20 @@ include 'locations_model.php';
      * @param lng A longitude of marker.
      */
     function saveData(lat, lng) {
-        var description = document.getElementById('manual_description').value;
-        var kecamatan = document.getElementById('manual_kecamatan').value;
-        var url = 'locations_model.php?add_location&description=' + description + kecamatan + '&lat=' + lat + '&lng=' + lng;
+        var url = 'locations_model.php?add_location&lat=' + lat + '&lng=' + lng;
         downloadUrl(url, function(data, responseCode) {
             if (responseCode === 200 && data.length > 1) {
                 var markerId = getMarkerUniqueId(lat, lng); // get marker id by using clicked point's coordinate
                 var manual_marker = markers[markerId]; // find marker
                 manual_marker.setIcon(purple_icon);
                 infowindow.close();
-                infowindow.setContent("<div style=' color: green; font-size: 25px;'> Waiting for admin confirm!!</div>");
+                infowindow.setContent("<div style=' color: green; font-size: 20px;'> Berhasil ditambahkan!</div><p>Silahkan konfirmasi dengan admin agar data dapat ditampilkan</p>");
                 infowindow.open(map, manual_marker);
 
             } else {
                 console.log(responseCode);
                 console.log(data);
-                infowindow.setContent("<div style='color: red; font-size: 25px;'>Inserting Errors</div>");
+                infowindow.setContent("<div style='color: red; font-size: 20px;'>Inserting Errors</div>");
             }
         });
     }

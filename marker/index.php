@@ -31,6 +31,9 @@
                         <div class="col-12 col-md-3 text-center">
                             <a class="btn btn-warning" href="map/index.php">Halaman Admin</a>
                         </div>
+                        <div class="col-12 col-md-3 text-center">
+                            <a class="btn btn-info" href="center.php">Atur Zoom Peta</a>
+                        </div>
             </div>
         </div>
     </div>

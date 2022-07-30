@@ -2,7 +2,11 @@
 include_once 'header.php';
 include 'locations_model.php';
 //get_unconfirmed_locations();exit;
+
 ?>
+
+
+
 
 <style>
     #image_data img {
@@ -25,12 +29,15 @@ include 'locations_model.php';
     var red_icon = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
     var purple_icon = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
     var locations = <?php get_confirmed_locations() ?>;
+    var getDataCenterMap = <?php get_center_map() ?>;
+    var dataCenter = getDataCenterMap[0];
+
     var centerMap = {
-        lat: -6.175168397319318,
-        lng: 106.8272493571782
+        lat: parseFloat(dataCenter.lat),
+        lng: parseFloat(dataCenter.lng),
     };
     var myOptions = {
-        zoom: 15,
+        zoom: parseFloat(dataCenter.zoom),
         center: new google.maps.LatLng(centerMap.lat, centerMap.lng),
         mapTypeId: 'roadmap'
     };

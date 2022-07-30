@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 26, 2022 at 01:59 PM
+-- Generation Time: Jul 27, 2022 at 04:18 PM
 -- Server version: 10.4.18-MariaDB
 -- PHP Version: 7.3.27
 
@@ -38,15 +38,25 @@ CREATE TABLE `agenda` (
   `tanggal` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `agenda`
+-- Table structure for table `center`
 --
 
-INSERT INTO `agenda` (`id_agenda`, `id_location`, `judul`, `status`, `hasil`, `persetujuan`, `dokumentasi`, `tanggal`) VALUES
-(6, 6, 'kegiatan dipo 1', 'tidak', 'tidak', 'tidak', '348070553_pexels-photo-127513.jpeg', '2022-07-12'),
-(7, 6, 'makan', 'makan', 'makan', 'makan', '348070553_pexels-photo-127513.jpeg', '2022-07-12'),
-(8, 4, 'lokasi 4', 'lokasi 4', 'lokasi 4', 'lokasi 4', '348070553_pexels-photo-127513.jpeg', '2022-07-12'),
-(9, 4, 'lokasi 5 asd asd', 'lokasi 5asd asdas', 'lokasi 4d as', 'asd', '348070553_pexels-photo-127513.jpeg', '2022-07-12');
+CREATE TABLE `center` (
+  `id` int(11) NOT NULL,
+  `lat` float NOT NULL,
+  `lng` float NOT NULL,
+  `zoom` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `center`
+--
+
+INSERT INTO `center` (`id`, `lat`, `lng`, `zoom`) VALUES
+(1, -6.17517, 106.827, 15);
 
 -- --------------------------------------------------------
 
@@ -66,15 +76,6 @@ CREATE TABLE `locations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `locations`
---
-
-INSERT INTO `locations` (`id`, `title`, `lat`, `lng`, `description`, `location_status`, `kecamatan`, `image`) VALUES
-(4, 'taman air mancul', -6.17512, 106.824, 'taman', 1, ' asd sad', ''),
-(6, 'patung dipo', -6.17308, 106.827, 'patng', 1, 'testt', '1530303602_Screenshot 2022-07-23 205445.png'),
-(7, 'gatau ini apa', -6.17709, 106.826, 'asd asd', 1, 'testt', '1530303602_Screenshot 2022-07-23 205445.png');
-
---
 -- Indexes for dumped tables
 --
 
@@ -84,6 +85,12 @@ INSERT INTO `locations` (`id`, `title`, `lat`, `lng`, `description`, `location_s
 ALTER TABLE `agenda`
   ADD PRIMARY KEY (`id_agenda`),
   ADD KEY `id_location` (`id_location`);
+
+--
+-- Indexes for table `center`
+--
+ALTER TABLE `center`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `locations`
@@ -99,13 +106,19 @@ ALTER TABLE `locations`
 -- AUTO_INCREMENT for table `agenda`
 --
 ALTER TABLE `agenda`
-  MODIFY `id_agenda` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_agenda` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT for table `center`
+--
+ALTER TABLE `center`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `locations`
 --
 ALTER TABLE `locations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Constraints for dumped tables

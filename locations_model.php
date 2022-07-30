@@ -2,68 +2,104 @@
 require("db.php");
 
 // Gets data from URL parameters.
-if(isset($_GET['add_location'])) {
+if (isset($_GET['add_location'])) {
     add_location();
 }
-if(isset($_GET['confirm_location'])) {
+if (isset($_GET['confirm_location'])) {
     confirm_location();
 }
 
 
+function get_center_map()
+{
 
-function add_location(){
-    $con=mysqli_connect ("localhost", 'root', '','demo');
+    $con = mysqli_connect("localhost", 'root', '', 'demo');
+    if (!$con) {
+        die('Not connected : ' . mysqli_connect_error());
+    }
+
+    $id = '1';
+
+
+    $sqldata = mysqli_query($con, "
+        select *
+        from center where id = '$id'
+        ");
+
+    $data = mysqli_fetch_all($sqldata, MYSQLI_ASSOC);
+
+
+    $rows = array();
+    while ($r = mysqli_fetch_assoc($sqldata)) {
+        $rows[] = $r;
+    }
+    $indexed = array_map('array_values', $rows);
+    //  $array = array_filter($indexed);
+
+
+    echo json_encode($data);
+    if (!$rows) {
+        return null;
+    }
+}
+
+function add_location()
+{
+    $con = mysqli_connect("localhost", 'root', '', 'demo');
     if (!$con) {
         die('Not connected : ' . mysqli_connect_error());
     }
     $lat = $_GET['lat'];
     $lng = $_GET['lng'];
-    $description =$_GET['description'];
+    $description = $_GET['description'];
     // Inserts new row with place data.
-    $query = sprintf("INSERT INTO locations "
-        . " (lat, lng, description) "
-        . " VALUES ('%s', '%s', '%s');",
-        mysqli_real_escape_string($con,$lat),
-        mysqli_real_escape_string($con,$lng),
-        mysqli_real_escape_string($con,$description));
+    $query = sprintf(
+        "INSERT INTO locations "
+            . " (lat, lng, description) "
+            . " VALUES ('%s', '%s', '%s');",
+        mysqli_real_escape_string($con, $lat),
+        mysqli_real_escape_string($con, $lng),
+        mysqli_real_escape_string($con, $description)
+    );
 
-    $result = mysqli_query($con,$query);
-    echo"Inserted Successfully";
-    if (!$result) {
-        die('Invalid query: ' . mysqli_error($con));
-    }
-}
-function confirm_location(){
-    $con=mysqli_connect ("localhost", 'root', '','demo');
-    if (!$con) {
-        die('Not connected : ' . mysqli_connect_error());
-    }
-    $id =$_GET['id'];
-    $confirmed =$_GET['confirmed'];
-    // update location with confirm if admin confirm.
-    $query = "update locations set location_status = $confirmed WHERE id = $id ";
-    $result = mysqli_query($con,$query);
+    $result = mysqli_query($con, $query);
     echo "Inserted Successfully";
     if (!$result) {
         die('Invalid query: ' . mysqli_error($con));
     }
 }
-function get_confirmed_locations(){
-    $con=mysqli_connect ("localhost", 'root', '','demo');
+function confirm_location()
+{
+    $con = mysqli_connect("localhost", 'root', '', 'demo');
+    if (!$con) {
+        die('Not connected : ' . mysqli_connect_error());
+    }
+    $id = $_GET['id'];
+    $confirmed = $_GET['confirmed'];
+    // update location with confirm if admin confirm.
+    $query = "update locations set location_status = $confirmed WHERE id = $id ";
+    $result = mysqli_query($con, $query);
+    echo "Inserted Successfully";
+    if (!$result) {
+        die('Invalid query: ' . mysqli_error($con));
+    }
+}
+function get_confirmed_locations()
+{
+    $con = mysqli_connect("localhost", 'root', '', 'demo');
     if (!$con) {
         die('Not connected : ' . mysqli_connect_error());
     }
     // update location with location_status if admin location_status.
-    $sqldata = mysqli_query($con,"
+    $sqldata = mysqli_query($con, "
 select id ,lat,lng,description, location_status as isconfirmed, title,image,kecamatan
 from locations WHERE  location_status = 1
   ");
 
     $rows = array();
 
-    while($r = mysqli_fetch_assoc($sqldata)) {
+    while ($r = mysqli_fetch_assoc($sqldata)) {
         $rows[] = $r;
-
     }
 
     $indexed = array_map('array_values', $rows);
@@ -74,56 +110,57 @@ from locations WHERE  location_status = 1
         return null;
     }
 }
-function get_all_locations(){
-    $con=mysqli_connect ("localhost", 'root', '','demo');
+function get_all_locations()
+{
+    $con = mysqli_connect("localhost", 'root', '', 'demo');
     if (!$con) {
         die('Not connected : ' . mysqli_connect_error());
     }
     // update location with location_status if admin location_status.
-    $sqldata = mysqli_query($con,"
+    $sqldata = mysqli_query($con, "
 select id,lat,lng,description,location_status as isconfirmed,title,image,kecamatan
 from locations
   ");
 
     $rows = array();
-    while($r = mysqli_fetch_assoc($sqldata)) {
+    while ($r = mysqli_fetch_assoc($sqldata)) {
         $rows[] = $r;
-
     }
-  $indexed = array_map('array_values', $rows);
-  //  $array = array_filter($indexed);
+    $indexed = array_map('array_values', $rows);
+    //  $array = array_filter($indexed);
 
     echo json_encode($indexed);
     if (!$rows) {
         return null;
     }
 }
-function get_agenda_by_id(){
-    $con=mysqli_connect ("localhost", 'root', '','demo');
+function get_agenda_by_id()
+{
+    $con = mysqli_connect("localhost", 'root', '', 'demo');
     if (!$con) {
         die('Not connected : ' . mysqli_connect_error());
     }
     $id = $_GET['id'];
     // update location with location_status if admin location_status.
-    $sqldata = mysqli_query($con,"
+    $sqldata = mysqli_query($con, "
         select *
         from agenda where id_location= '$id'
         ");
 
     $rows = array();
-    while($r = mysqli_fetch_assoc($sqldata)) {
+    while ($r = mysqli_fetch_assoc($sqldata)) {
         $rows[] = $r;
-
     }
-  $indexed = array_map('array_values', $rows);
-  //  $array = array_filter($indexed);
+    $indexed = array_map('array_values', $rows);
+    //  $array = array_filter($indexed);
 
     echo json_encode($sqldata);
     if (!$rows) {
         return null;
     }
 }
-function array_flatten($array) {
+function array_flatten($array)
+{
     if (!is_array($array)) {
         return FALSE;
     }
@@ -131,8 +168,7 @@ function array_flatten($array) {
     foreach ($array as $key => $value) {
         if (is_array($value)) {
             $result = array_merge($result, array_flatten($value));
-        }
-        else {
+        } else {
             $result[$key] = $value;
         }
     }
